@@ -30,9 +30,11 @@ INCDIR=include
 all: $(EXE)
 
 $(EXE): $(OBJ)
+	@mkdir -p $(@D)
 	$(CC) $(CFLAGS) $^ $(LIB) -I $(INCDIR) -o $@
 	
 $(OBJDIR)/%.o: $(SRCDIR)/%.cpp
+	@mkdir -p $(@D)
 	$(CC) $(CFLAGS) -c $< -I $(INCDIR) -o $@
 	
 clean:
