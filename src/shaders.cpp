@@ -1,6 +1,6 @@
 #include <shaders.h>
 
-Shaders::Shaders(const char* vertexPath, const char* fragmentPath, const char* geometryPath = nullptr){
+Shaders::Shaders(const char* vertexPath, const char* fragmentPath, const char* geometryPath){
 	//We retrieve the source code from the files
 	std::string vertexCode;
 	std::string fragmentCode;
