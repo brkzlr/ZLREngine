@@ -16,7 +16,7 @@ private:
 
 public:
 	//We'll leave geometryPath as null as we do not use geometry shaders for now.
-	Shaders(const char* vertexPath, const char* fragmentPath, const char* geometryPath);
+	Shaders(const char* vertexPath, const char* fragmentPath, const char* geometryPath = nullptr);
 	void use();
 
 	//Shader uniform setting functions
