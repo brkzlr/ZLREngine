@@ -4,6 +4,9 @@
 #include <shaders.h>
 #include <stb_image.h>
 
+#include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
+
 int main(){
 	//Settings
 	const unsigned int SCR_WIDTH = 800;
@@ -161,6 +164,11 @@ int main(){
 		glBindVertexArray(VAO);
 		glDrawArrays(GL_TRIANGLES, 0, 36);
 		SDL_GL_SwapWindow(mainWindow);
+
+		//Rotate cube over time
+		glm::mat4 model(1.0f);
+		model = glm::rotate(model, static_cast<float>(SDL_GetTicks()/1000.0f) * glm::radians(50.0f), glm::vec3(0.5f, 1.0f, 0.0f));
+		shader.setMat4("model", model);
 
 	}
 
