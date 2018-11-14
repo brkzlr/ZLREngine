@@ -166,17 +166,17 @@ int main(){
 		SDL_GL_SwapWindow(mainWindow);
 
 		//Rotate cube over time
-		glm::mat4 model(1.0f);
-		model = glm::rotate(model, static_cast<float>(SDL_GetTicks()/1000.0f) * glm::radians(50.0f), glm::vec3(0.5f, 1.0f, 0.0f));
-		shader.setMat4("model", model);
+		glm::mat4 modelMat(1.0f);
+		modelMat = glm::rotate(modelMat, static_cast<float>(SDL_GetTicks()/1000.0f) * glm::radians(50.0f), glm::vec3(0.5f, 1.0f, 0.0f));
+		shader.setMat4("modelMatrix", modelMat);
 
-		glm::mat4 view(1.0f);
-		view = glm::translate(view, glm::vec3(0.0f, 0.0f, -3.0f));
-		shader.setMat4("view", view);
+		glm::mat4 viewMat(1.0f);
+		viewMat = glm::translate(viewMat, glm::vec3(0.0f, 0.0f, -3.0f));
+		shader.setMat4("viewMatrix", viewMat);
 
-		glm::mat4 projection(1.0f);
-		projection = glm::perspective(glm::radians(45.0f), static_cast<float>(SCR_WIDTH)/static_cast<float>(SCR_HEIGHT), 0.1f, 100.0f);
-		shader.setMat4("projection", projection);
+		glm::mat4 projectionMat(1.0f);
+		projectionMat = glm::perspective(glm::radians(45.0f), static_cast<float>(SCR_WIDTH)/static_cast<float>(SCR_HEIGHT), 0.1f, 100.0f);
+		shader.setMat4("projectionMatrix", projectionMat);
 	}
 
 	//De-allocate all resources then quit
