@@ -170,6 +170,13 @@ int main(){
 		model = glm::rotate(model, static_cast<float>(SDL_GetTicks()/1000.0f) * glm::radians(50.0f), glm::vec3(0.5f, 1.0f, 0.0f));
 		shader.setMat4("model", model);
 
+		glm::mat4 view(1.0f);
+		view = glm::translate(view, glm::vec3(0.0f, 0.0f, -3.0f));
+		shader.setMat4("view", view);
+
+		glm::mat4 projection(1.0f);
+		projection = glm::perspective(glm::radians(45.0f), static_cast<float>(SCR_WIDTH)/static_cast<float>(SCR_HEIGHT), 0.1f, 100.0f);
+		shader.setMat4("projection", projection);
 	}
 
 	//De-allocate all resources then quit
