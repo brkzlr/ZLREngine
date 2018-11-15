@@ -17,6 +17,8 @@ Camera::Camera(glm::vec3 position, glm::vec3 up, float yaw, float pitch){
 	WorldUp = up;
 	Yaw = yaw;
 	Pitch = pitch;
+	MovementSpeed = 2.5f;
+	MouseSens = 0.2f;
 	updateCameraVectors();
 }
 

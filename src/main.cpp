@@ -1,11 +1,13 @@
 #include <iostream>
 #include <SDL2/SDL.h>
 #include <glad.h>
-#include <shaders.h>
 #include <stb_image.h>
 
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
+
+#include <shaders.h>
+#include <camera.h>
 
 int main(){
 	//Settings
@@ -141,6 +143,14 @@ int main(){
 	bool quit = false;
 	SDL_Event ev;
 
+	//Frame timing
+	float deltaTime = 0.0f;
+	float lastFrame = 0.0f;
+
+	//Our FPS Camera
+	Camera cam(glm::vec3(0.0f, 0.0f, 3.0f));
+	bool firstLook = true;
+
 	//Render loop
 	while (!quit){
 		while(SDL_PollEvent(&ev) != 0){
@@ -155,6 +165,45 @@ int main(){
 					break;
 			}
 		}
+
+		//Calculate deltaTime for per-frame time logic
+		float currentFrame = SDL_GetTicks()/1000.0f;
+		deltaTime = currentFrame - lastFrame;
+		lastFrame = currentFrame;
+
+		//Query our keyboard state
+		const Uint8 *keyState = SDL_GetKeyboardState(NULL);
+		//Query our mouse position
+		int mouseX, mouseY;
+		SDL_GetMouseState(&mouseX, &mouseY);
+
+		//Camera Movement
+		if( keyState[SDL_SCANCODE_W] ){
+			cam.MoveCamera(Camera::FORWARD, deltaTime);
+		}
+		if( keyState[SDL_SCANCODE_S] ){
+			cam.MoveCamera(Camera::BACKWARD, deltaTime);
+		}
+		if( keyState[SDL_SCANCODE_A] ){
+			cam.MoveCamera(Camera::LEFT, deltaTime);
+		}
+		if( keyState[SDL_SCANCODE_D] ){
+			cam.MoveCamera(Camera::RIGHT, deltaTime);
+		}
+
+		//Camera Mouse Look
+		float xPos = mouseX - SCR_HEIGHT/2.0f;
+		float yPos = SCR_WIDTH/2.0f - mouseY;
+		//Small workaround hack to stop having camera jump to a random position at game start. TO DO
+		if (firstLook){
+			xPos = 0;
+			yPos = 0;
+			firstLook = false;
+		}
+		cam.CameraLook(xPos, yPos);
+		//Warp mouse to center after each look so we won't have constrained yaw rotation
+		SDL_WarpMouseInWindow(mainWindow, SCR_HEIGHT/2.0f, SCR_WIDTH/2.0f);
+
 		glClearColor(0.3f, 0.3f, 0.3f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
@@ -171,7 +220,7 @@ int main(){
 		shader.setMat4("modelMatrix", modelMat);
 
 		glm::mat4 viewMat(1.0f);
-		viewMat = glm::translate(viewMat, glm::vec3(0.0f, 0.0f, -3.0f));
+		viewMat = cam.GetViewMatrix();
 		shader.setMat4("viewMatrix", viewMat);
 
 		glm::mat4 projectionMat(1.0f);
