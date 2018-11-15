@@ -19,6 +19,7 @@ Camera::Camera(glm::vec3 position, glm::vec3 up, float yaw, float pitch){
 	Pitch = pitch;
 	MovementSpeed = 2.5f;
 	MouseSens = 0.2f;
+	bSprint = false;
 	updateCameraVectors();
 }
 
@@ -28,6 +29,8 @@ glm::mat4 Camera::GetViewMatrix(){
 
 void Camera::MoveCamera(Camera_Direction direction, float deltaTime){
 	float camVelocity = MovementSpeed * deltaTime;
+	if (bSprint)
+		camVelocity *= 2.0f;
 	switch(direction){
 		case FORWARD:
 			Position += Front * camVelocity;
@@ -58,4 +61,8 @@ void Camera::CameraLook(float xPos, float yPos){
 		Pitch = -89.0f;
 
 	updateCameraVectors();
+}
+
+void Camera::Sprint(bool value){
+	bSprint = value;
 }
