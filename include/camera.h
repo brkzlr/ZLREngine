@@ -26,6 +26,7 @@ private:
 
 	float MovementSpeed;
 	float MouseSens;
+	bool bSprint;
 
 	void updateCameraVectors();
 
@@ -34,6 +35,7 @@ public:
 	glm::mat4 GetViewMatrix();
 	void MoveCamera(Camera_Direction direction, float deltaTime);
 	void CameraLook(float xPos, float yPos);
+	void Sprint(bool value);
 };
 
 #endif

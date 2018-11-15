@@ -190,6 +190,12 @@ int main(){
 		if( keyState[SDL_SCANCODE_D] ){
 			cam.MoveCamera(Camera::RIGHT, deltaTime);
 		}
+		if( keyState[SDL_SCANCODE_LSHIFT] ){
+			cam.Sprint(true);
+		}
+		else{
+			cam.Sprint(false);
+		}
 
 		//Camera Mouse Look
 		float xPos = mouseX - SCR_HEIGHT/2.0f;
