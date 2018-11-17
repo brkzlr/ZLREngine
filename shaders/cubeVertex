@@ -1,0 +1,23 @@
+#version 330 core
+
+layout (location = 0) in vec3 inPos;
+layout (location = 1) in vec2 inTexCoord;
+layout (location = 2) in vec3 inNormal;
+
+out vec2 TexCoord;
+out vec3 Normal;
+out vec3 FragPos;
+
+uniform mat4 modelMatrix;
+uniform mat4 viewMatrix;
+uniform mat4 projectionMatrix;
+
+void main(){
+	//Vertex Positioning and textures
+	gl_Position = projectionMatrix * viewMatrix * modelMatrix * vec4(inPos, 1.0f);
+	TexCoord = inTexCoord;
+
+	//Lighting
+	Normal = mat3(transpose(inverse(modelMatrix))) * inNormal;
+	FragPos = vec3(modelMatrix * vec4(inPos, 1.0));
+}
