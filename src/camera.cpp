@@ -66,3 +66,7 @@ void Camera::CameraLook(float xPos, float yPos){
 void Camera::Sprint(bool value){
 	bSprint = value;
 }
+
+glm::vec3 Camera::getPosition() const{
+	return Position;
+}
