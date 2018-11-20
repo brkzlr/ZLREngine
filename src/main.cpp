@@ -9,6 +9,8 @@
 #include <shaders.h>
 #include <camera.h>
 
+unsigned int loadTexture(char const * path);
+
 int main(){
 	//Settings
 	const unsigned int SCR_WIDTH = 800;
@@ -44,27 +46,7 @@ int main(){
 	glEnable(GL_DEPTH_TEST);
 
 	//Load and create texture
-	unsigned int cubeTexture;
-	glGenTextures(1, &cubeTexture);
-	glBindTexture(GL_TEXTURE_2D, cubeTexture);
-	//Set texture wrapping options
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-	//Set texture filtering options
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-	
-	int width, height, nrChannels;
-	stbi_set_flip_vertically_on_load(true);
-	unsigned char* tData = stbi_load("textures/brick.jpg", &width, &height, &nrChannels, 0);
-	if (tData){
-		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, tData);
-		glGenerateMipmap(GL_TEXTURE_2D);
-	}
-	else{
-		std::cerr << "Failed to load texture" << std::endl;
-	}
-	stbi_image_free(tData);
+	unsigned int cubeTexture = loadTexture("textures/brick.jpg");
 
 	//Vertex data
 	float vertices[] = {
@@ -271,4 +253,37 @@ int main(){
 	mainWindow = nullptr;
 	SDL_Quit();
 	return 0;
+}
+
+unsigned int loadTexture(char const *path){
+	unsigned int textureID;
+	glGenTextures(1, &textureID);
+
+	int width, height, nrComponents;
+	unsigned char *data = stbi_load(path, &width, &height, &nrComponents, 0);
+	if (data){
+		GLenum format;
+		if(nrComponents == 1)
+			format = GL_RED;
+		else if(nrComponents == 3)
+			format = GL_RGB;
+		else if(nrComponents == 4)
+			format = GL_RGBA;
+		
+		glBindTexture(GL_TEXTURE_2D, textureID);
+		glTexImage2D(GL_TEXTURE_2D, 0, format, width, height, 0, format, GL_UNSIGNED_BYTE, data);
+		glGenerateMipmap(GL_TEXTURE_2D);
+
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+		stbi_image_free(data);
+	}
+	else{
+		std::cerr << "Texture failed to load at path: " << path << std::endl;
+		stbi_image_free(data);
+	}
+	return textureID;
 }
