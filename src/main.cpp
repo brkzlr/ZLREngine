@@ -46,7 +46,8 @@ int main(){
 	glEnable(GL_DEPTH_TEST);
 
 	//Load and create texture
-	unsigned int cubeTexture = loadTexture("textures/brick.jpg");
+	unsigned int diffMap = loadTexture("textures/container.png");
+	unsigned int specMap = loadTexture("textures/container_spec.png");
 
 	//Vertex data
 	float vertices[] = {
@@ -208,12 +209,19 @@ int main(){
 
 		//Activate all buffer objects and shaders.
 		shader.use();
-		glBindTexture(GL_TEXTURE_2D, cubeTexture);
+		glActiveTexture(GL_TEXTURE0);
+		glBindTexture(GL_TEXTURE_2D, diffMap);
+		glActiveTexture(GL_TEXTURE1);
+		glBindTexture(GL_TEXTURE_2D, specMap);
 		glBindVertexArray(cubeVAO);
 		glDrawArrays(GL_TRIANGLES, 0, 36);
-		shader.setVec3("objectColor", glm::vec3(0.8f, 0.8f, 0.8f));
-		shader.setVec3("lightColor", glm::vec3(1.0f, 1.0f, 1.0f));
-		shader.setVec3("lightPos", lightPos);
+		shader.setInt("material.diffuse", 0);
+		shader.setInt("material.specular", 1);
+		shader.setFloat("material.shineVal", 32.0f);
+		shader.setVec3("light.ambient", glm::vec3(0.2f, 0.2f, 0.2f));
+		shader.setVec3("light.diffuse", glm::vec3(0.8f, 0.8f, 0.8f));
+		shader.setVec3("light.specular", glm::vec3(1.0f, 1.0f, 1.0f));
+		shader.setVec3("light.position", lightPos);
 		shader.setVec3("viewPos", cam.getPosition());
 		
 
