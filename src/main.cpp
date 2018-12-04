@@ -204,8 +204,8 @@ int main(){
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 		//Change lightPos over time
-		lightPos.x = sin(SDL_GetTicks() / 1000.0f) * 2.0f;
-		lightPos.z = cos(SDL_GetTicks() / 1000.0f) * 1.5f;
+		//lightPos.x = sin(SDL_GetTicks() / 1000.0f) * 2.0f;
+		lightPos.z = cos(SDL_GetTicks() / 1000.0f) * 5.5f;
 
 		//Activate all buffer objects and shaders.
 		shader.use();
@@ -218,16 +218,26 @@ int main(){
 		shader.setInt("material.diffuse", 0);
 		shader.setInt("material.specular", 1);
 		shader.setFloat("material.shineVal", 32.0f);
-		shader.setVec3("light.ambient", glm::vec3(0.2f, 0.2f, 0.2f));
-		shader.setVec3("light.diffuse", glm::vec3(0.8f, 0.8f, 0.8f));
-		shader.setVec3("light.specular", glm::vec3(1.0f, 1.0f, 1.0f));
-		shader.setVec3("light.position", lightPos);
 		shader.setVec3("viewPos", cam.getPosition());
-		
+
+		//Directional Light
+		shader.setVec3("sun.ambient", glm::vec3(0.05f, 0.05f, 0.05f));
+		shader.setVec3("sun.diffuse", glm::vec3(0.4f, 0.4f, 0.4f));
+		shader.setVec3("sun.specular", glm::vec3(0.5f, 0.5f, 0.5f));
+		shader.setVec3("sun.direction", glm::vec3(-0.2f, -1.0f, -0.3f));
+
+		//Point Light
+		shader.setVec3("pLight.ambient", glm::vec3(0.05f, 0.05f, 0.05f));
+		shader.setVec3("pLight.diffuse", glm::vec3(0.8f, 0.8f, 0.8f));
+		shader.setVec3("pLight.specular", glm::vec3(1.0f, 1.0f, 1.0f));
+		shader.setVec3("pLight.position", lightPos);
+		shader.setFloat("pLight.constant", 1.0f);
+		shader.setFloat("pLight.linear", 0.09f);
+		shader.setFloat("pLight.quadratic", 0.032f);
 
 		//Rotate cube over time
 		glm::mat4 modelMat(1.0f);
-		modelMat = glm::rotate(modelMat, static_cast<float>(SDL_GetTicks()/1000.0f) * glm::radians(50.0f), glm::vec3(0.5f, 1.0f, 0.0f));
+		//modelMat = glm::rotate(modelMat, static_cast<float>(SDL_GetTicks()/1000.0f) * glm::radians(50.0f), glm::vec3(0.5f, 1.0f, 0.0f));
 		shader.setMat4("modelMatrix", modelMat);
 
 		glm::mat4 viewMat(1.0f);
