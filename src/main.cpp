@@ -204,8 +204,8 @@ int main(){
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 		//Change lightPos over time
-		//lightPos.x = sin(SDL_GetTicks() / 1000.0f) * 2.0f;
-		lightPos.z = cos(SDL_GetTicks() / 1000.0f) * 5.5f;
+		lightPos.x = sin(SDL_GetTicks() / 1000.0f) * 2.0f;
+		lightPos.z = cos(SDL_GetTicks() / 1000.0f) * 1.5f;
 
 		//Activate all buffer objects and shaders.
 		shader.use();
@@ -237,7 +237,7 @@ int main(){
 
 		//Rotate cube over time
 		glm::mat4 modelMat(1.0f);
-		//modelMat = glm::rotate(modelMat, static_cast<float>(SDL_GetTicks()/1000.0f) * glm::radians(50.0f), glm::vec3(0.5f, 1.0f, 0.0f));
+		modelMat = glm::rotate(modelMat, static_cast<float>(SDL_GetTicks()/1000.0f) * glm::radians(50.0f), glm::vec3(0.5f, 1.0f, 0.0f));
 		shader.setMat4("modelMatrix", modelMat);
 
 		glm::mat4 viewMat(1.0f);
