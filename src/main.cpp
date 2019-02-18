@@ -140,6 +140,7 @@ int main(){
 
 	//Light
 	glm::vec3 lightPos = glm::vec3(1.0f, 0.0f, 1.5f);
+	bool flash = false;
 
 	//Render loop
 	while (!quit){
@@ -185,6 +186,12 @@ int main(){
 		}
 		else{
 			cam.Sprint(false);
+		}
+		if( keyState[SDL_SCANCODE_F]){
+			flash = true;
+		}
+		if( keyState[SDL_SCANCODE_G]){
+			flash = false;
 		}
 
 		//Camera Mouse Look
@@ -234,6 +241,19 @@ int main(){
 		shader.setFloat("pLight.constant", 1.0f);
 		shader.setFloat("pLight.linear", 0.09f);
 		shader.setFloat("pLight.quadratic", 0.032f);
+
+		//Spot Light
+		shader.setVec3("flashlight.position", cam.getPosition());
+		shader.setVec3("flashlight.direction", cam.getCamForward());
+		shader.setVec3("flashlight.ambient", glm::vec3(0.0f, 0.0f, 0.0f));
+		shader.setVec3("flashlight.diffuse", glm::vec3(1.0f, 1.0f, 1.0f));
+		shader.setVec3("flashlight.specular", glm::vec3(1.0f, 1.0f, 1.0f));
+		shader.setFloat("flashlight.constant", 1.0f);
+		shader.setFloat("flashlight.linear", 0.09f);
+		shader.setFloat("flashlight.quadratic", 0.032f);
+		shader.setFloat("flashlight.cutoffAngle", glm::cos(glm::radians(12.5f)));
+		shader.setFloat("flashlight.outerCutoff", glm::cos(glm::radians(15.0f)));
+		shader.setBool("isFLon", flash);
 
 		//Rotate cube over time
 		glm::mat4 modelMat(1.0f);
