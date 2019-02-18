@@ -37,6 +37,7 @@ public:
 	void CameraLook(float xPos, float yPos);
 	void Sprint(bool value);
 	glm::vec3 getPosition() const;
+	glm::vec3 getCamForward() const;
 };
 
 #endif

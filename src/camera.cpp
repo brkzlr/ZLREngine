@@ -70,3 +70,7 @@ void Camera::Sprint(bool value){
 glm::vec3 Camera::getPosition() const{
 	return Position;
 }
+
+glm::vec3 Camera::getCamForward() const{
+	return Front;
+}
