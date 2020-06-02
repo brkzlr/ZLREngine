@@ -1,13 +1,13 @@
 #include <iostream>
 #include <SDL2/SDL.h>
-#include <glad.h>
-#include <stb_image.h>
+#include "External/glad.h"
+#include "External/stb_image.h"
 
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 
-#include <shaders.h>
-#include <camera.h>
+#include "shaders.h"
+#include "3C/camera.h"
 
 unsigned int loadTexture(char const * path);
 
