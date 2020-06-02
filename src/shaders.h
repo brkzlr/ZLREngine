@@ -3,31 +3,27 @@
 
 #include "External/glad.h"
 #include <glm/glm.hpp>
-
-#include <iostream>
 #include <string>
-#include <fstream>
-#include <sstream>
 
 class Shaders{
 private:
-	unsigned int ID;
-	void checkCompileErrors(GLuint shader, std::string type);
+	unsigned int m_ID;
+	void CheckCompileErrors(GLuint shader, const std::string& type);
 
 public:
 	//We'll leave geometryPath as null as we do not use geometry shaders for now.
 	Shaders(const char* vertexPath, const char* fragmentPath, const char* geometryPath = nullptr);
-	void use();
+	void Use();
 
 	//Shader uniform setting functions
-	void setBool(const std::string &name, bool value) const;
-	void setInt(const std::string &name, int value) const;
-	void setFloat(const std::string &name, float value) const;
-	void setVec2(const std::string &name, const glm::vec2 &value) const;
-	void setVec3(const std::string &name, const glm::vec3 &value) const;
-	void setVec4(const std::string &name, const glm::vec4 &value) const;
-	void setMat2(const std::string &name, const glm::mat2 &mat) const;
-	void setMat3(const std::string &name, const glm::mat3 &mat) const;
-	void setMat4(const std::string &name, const glm::mat4 &mat) const;
+	void SetBool(const std::string& name, bool value);
+	void SetInt(const std::string& name, int value);
+	void SetFloat(const std::string& name, float value);
+	void SetVec2(const std::string& name, const glm::vec2& value);
+	void SetVec3(const std::string& name, const glm::vec3& value);
+	void SetVec4(const std::string& name, const glm::vec4& value);
+	void SetMat2(const std::string& name, const glm::mat2& mat);
+	void SetMat3(const std::string& name, const glm::mat3& mat);
+	void SetMat4(const std::string& name, const glm::mat4& mat);
 };
 #endif
