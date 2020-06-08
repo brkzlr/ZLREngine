@@ -1,6 +1,8 @@
+#include "precomp.h"
 #include "shaders.h"
-#include <iostream>
+#include "External/glad.h"
 #include <fstream>
+#include <iostream>
 #include <sstream>
 
 Shaders::Shaders(const char* vertexPath, const char* fragmentPath, const char* geometryPath){
@@ -120,7 +122,7 @@ void Shaders::SetMat4(const std::string &name, const glm::mat4 &mat){
 	glUniformMatrix4fv(glGetUniformLocation(m_ID, name.c_str()), 1, GL_FALSE, &mat[0][0]);
 }
 
-void Shaders::CheckCompileErrors(GLuint shader, const std::string& type){
+void Shaders::CheckCompileErrors(unsigned int shader, const std::string& type){
 	GLint success;
 	GLchar log[1024];
 	if(type != "Program"){
