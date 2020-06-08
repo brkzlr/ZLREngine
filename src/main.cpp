@@ -3,12 +3,6 @@
 #include "External/glad.h"
 #include "External/stb_image.h"
 
-#include <glm/glm.hpp>
-#include <glm/gtc/matrix_transform.hpp>
-
-#include "shaders.h"
-#include "3C/CameraManager.h"
-
 unsigned int LoadTexture(const char* path);
 
 int main(){

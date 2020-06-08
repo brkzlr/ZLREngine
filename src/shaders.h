@@ -1,14 +1,10 @@
 #ifndef SHADERS_H
 #define SHADERS_H
 
-#include "External/glad.h"
-#include <glm/glm.hpp>
-#include <string>
-
 class Shaders{
 private:
 	unsigned int m_ID;
-	void CheckCompileErrors(GLuint shader, const std::string& type);
+	void CheckCompileErrors(unsigned int shader, const std::string& type);
 
 public:
 	//We'll leave geometryPath as null as we do not use geometry shaders for now.
