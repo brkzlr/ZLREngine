@@ -1,4 +1,5 @@
-#include "CameraManager.h"
+#include "precomp.h"
+#include "3C/CameraManager.h"
 
 CameraManager* CameraManager::ms_Instance = nullptr;
 

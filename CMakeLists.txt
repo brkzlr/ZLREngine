@@ -11,3 +11,5 @@ add_executable(zlr ${SOURCES})
 
 target_compile_options(zlr PRIVATE -g -pedantic-errors)
 target_link_libraries(zlr PRIVATE dl SDL2)
+target_include_directories(zlr PRIVATE ${CMAKE_SOURCE_DIR}/src)
+target_precompile_headers(zlr PRIVATE ${CMAKE_SOURCE_DIR}/src/precomp.h)
