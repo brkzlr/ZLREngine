@@ -1,5 +1,7 @@
 bin
-.vscode*
+.cmake
+.idea
+Testing
 CMakeCache.txt
 CMakeFiles
 Makefile
