@@ -4,6 +4,9 @@
 class CameraManager{
 public:
 	static CameraManager* GetInstance();
+	CameraManager(const CameraManager&) = delete;
+	void operator=(const CameraManager&) = delete;
+
 	void Initialize(glm::vec3 position, glm::vec3 up, float yaw, float pitch);
 	void Update();
 
@@ -18,6 +21,7 @@ public:
 private:
 	CameraManager() = default;
 	static CameraManager* ms_Instance;
+
 	enum class ECameraDirection{
 		FORWARD,
 		BACKWARD,
