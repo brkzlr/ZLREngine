@@ -8,15 +8,12 @@ public:
 	void operator=(const CameraManager&) = delete;
 
 	void Initialize(glm::vec3 position, glm::vec3 up, float yaw, float pitch);
-	void Update();
+	void Update(float deltaTime);
 
 	//Getters
 	glm::vec3 GetPosition() const { return m_Position; }
 	glm::vec3 GetCamForward() const { return m_Front; }
 	glm::mat4 GetViewMatrix() const { return glm::lookAt(m_Position, m_Position + m_Front, m_Up); }
-
-	//Setters
-	void SetSprint(bool value) { m_Sprint = value; }
 
 private:
 	CameraManager() = default;
@@ -44,7 +41,7 @@ private:
 
 	float m_MovementSpeed = 2.5f; //Test value for now
 	float m_MouseSens = 0.2f;	  //Test value for now
-	bool m_Sprint = false;
+	bool m_Sprint = false;      //Move to entity class when created
 };
 
 #endif
