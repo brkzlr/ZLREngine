@@ -1,6 +1,9 @@
 #include "precomp.h"
 #include "3C/CameraManager.h"
 
+#include "3C/InputManager.h"
+#include "Constants.h"
+
 CameraManager* CameraManager::ms_Instance = nullptr;
 
 CameraManager* CameraManager::GetInstance(){
@@ -18,8 +21,36 @@ void CameraManager::Initialize(glm::vec3 position, glm::vec3 up, float yaw, floa
 	UpdateCameraVectors();
 }
 
-void CameraManager::Update(){
-	//Check if movement input was made through events.
+void CameraManager::Update(float deltaTime){
+	InputManager* inputMgr = InputManager::GetInstance();
+	if (!inputMgr){
+		return;
+	}
+
+	//Keyboard
+	if(inputMgr->IsKeyPressed(SDL_SCANCODE_W)){
+		MoveCamera(ECameraDirection::FORWARD, deltaTime);
+	}
+	if(inputMgr->IsKeyPressed(SDL_SCANCODE_S)){
+		MoveCamera(ECameraDirection::BACKWARD, deltaTime);
+	}
+	if(inputMgr->IsKeyPressed(SDL_SCANCODE_A)){
+		MoveCamera(ECameraDirection::LEFT, deltaTime);
+	}
+	if(inputMgr->IsKeyPressed(SDL_SCANCODE_D)){
+		MoveCamera(ECameraDirection::RIGHT, deltaTime);
+	}
+	if(inputMgr->IsKeyPressed(SDL_SCANCODE_LSHIFT)){
+		m_Sprint = true;
+	}
+	else{
+		m_Sprint = false;
+	}
+
+	//Mouse
+	float xPos = inputMgr->GetMouseX() - SCR_HEIGHT/2.0f;
+	float yPos = SCR_WIDTH/2.0f - inputMgr->GetMouseY();
+	CameraLook(xPos, yPos);
 }
 
 void CameraManager::UpdateCameraVectors(){
@@ -35,10 +66,11 @@ void CameraManager::UpdateCameraVectors(){
 }
 
 void CameraManager::MoveCamera(ECameraDirection direction, float deltaTime){
+	float movementSpeed = m_MovementSpeed;
 	if (m_Sprint){
-		m_MovementSpeed *= 2.0f;
+		movementSpeed *= 2.0f;
 	}
-	float camVelocity = m_MovementSpeed * deltaTime;
+	float camVelocity = movementSpeed * deltaTime;
 
 	switch(direction){
 		case ECameraDirection::FORWARD:
