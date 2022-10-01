@@ -1,7 +1,7 @@
 #ifndef INPUTMANAGER_H
 #define INPUTMANAGER_H
 
-#include <SDL2/SDL_keycode.h>
+#include <SDL2/SDL_scancode.h>
 
 class InputManager {
 public:
@@ -11,7 +11,7 @@ public:
 
 	void Update();
 
-	bool IsKeyPressed(SDL_Keycode key) const { return m_KeyState && m_KeyState[key]; }
+	bool IsKeyPressed(SDL_Scancode key) const { return m_KeyState && m_KeyState[key]; }
 	bool IsMouseBtnPressed(int mouseBtn) const;
 
 	int GetMouseX() const { return m_MouseX; }
