@@ -1,5 +1,7 @@
 #include <iostream>
 #include <SDL2/SDL.h>
+
+#define GLAD_GL_IMPLEMENTATION
 #include "External/glad.h"
 #include "External/stb_image.h"
 
@@ -30,7 +32,7 @@ int main(){
 	}
 
 	//Load all OpenGL function pointers using glad
-	if (!gladLoadGLLoader(SDL_GL_GetProcAddress)){
+	if (!gladLoadGL(reinterpret_cast<GLADloadfunc>(SDL_GL_GetProcAddress))){
 		std::cerr << "Failed to initialize GLAD" << std::endl;
 		return -1;
 	}
