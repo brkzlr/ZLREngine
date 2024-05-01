@@ -1,11 +1,10 @@
 bin
-.cmake
-.idea
-Testing
-CMakeCache.txt
-CMakeFiles
-Makefile
-cmake_install.cmake
 
-# MacOS ignores
-.DS_Store
+# Ignore all CMake/Make stuff except Lists
+compile_commands.json
+*[Mm]ake*
+!CMakeLists.txt
+
+# Ignore all dot files/folders
+.*
+!.gitignore
