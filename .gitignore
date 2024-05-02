@@ -5,6 +5,7 @@ compile_commands.json
 *[Mm]ake*
 !CMakeLists.txt
 
-# Ignore all dot files/folders
+# Ignore all dot files/folders except a few important files
 .*
 !.gitignore
+!.clang-format
