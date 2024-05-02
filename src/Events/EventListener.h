@@ -3,20 +3,21 @@
 
 class Event;
 
-class EventListenerBase{
+class EventListenerBase {
 public:
 	virtual void Call(Event* event) = 0;
 };
 
-template<typename EventType>
-class EventListener : public EventListenerBase{
+template <typename EventType>
+class EventListener : public EventListenerBase {
 public:
 	EventListener(const std::function<void(EventType*)>& callback)
-	: m_Callback(callback){
-
+	    : m_Callback(callback)
+	{
 	}
 
-	virtual void Call(Event* event) override{
+	virtual void Call(Event* event) override
+	{
 		m_Callback(static_cast<EventType*>(event));
 	}
 

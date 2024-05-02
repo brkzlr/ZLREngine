@@ -27,4 +27,4 @@ private:
 	int m_MouseY = 0;
 };
 
-#endif //INPUTMANAGER_H
+#endif // INPUTMANAGER_H

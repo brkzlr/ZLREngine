@@ -4,7 +4,7 @@
 #include "Events/EventListener.h"
 #include <typeindex>
 
-class EventDispatcher{
+class EventDispatcher {
 	using ListenerList = std::vector<EventListenerBase*>;
 
 public:
@@ -12,11 +12,11 @@ public:
 	EventDispatcher(const EventDispatcher&) = delete;
 	void operator=(const EventDispatcher&) = delete;
 
- 	template<typename T, typename EventType>
+	template <typename T, typename EventType>
 	void AddListener(T* classInstance, void (T::*memberFunc)(EventType*));
 
 	//@TODO: Make an event queue and process it at end of frame
-	template<typename EventType>
+	template <typename EventType>
 	void Broadcast(EventType* event);
 
 private:
@@ -28,11 +28,12 @@ private:
 
 ////////////////////////////////////////////////////////////
 ////////////////////// Templates impl //////////////////////
-template<typename T, typename EventType>
-void EventDispatcher::AddListener(T* classInstance, void (T::*memberFunc)(EventType*)){
+template <typename T, typename EventType>
+void EventDispatcher::AddListener(T* classInstance, void (T::*memberFunc)(EventType*))
+{
 	ListenerList* listeners = m_ListenersMap[typeid(EventType)];
 
-	if(!listeners){
+	if (!listeners) {
 		listeners = new ListenerList();
 		m_ListenersMap[typeid(EventType)] = listeners;
 	}
@@ -40,16 +41,17 @@ void EventDispatcher::AddListener(T* classInstance, void (T::*memberFunc)(EventT
 	listeners->push_back(new EventListener<EventType>(std::bind(memberFunc, classInstance, std::placeholders::_1)));
 }
 
-template<typename EventType>
-void EventDispatcher::Broadcast(EventType* event){
+template <typename EventType>
+void EventDispatcher::Broadcast(EventType* event)
+{
 	ListenerList* listeners = m_ListenersMap[typeid(EventType)];
 
-	if (!listeners){
+	if (!listeners) {
 		return;
 	}
 
-	for (EventListenerBase* listener : *listeners){
-		if (listener){
+	for (EventListenerBase* listener : *listeners) {
+		if (listener) {
 			listener->Call(event);
 		}
 	}

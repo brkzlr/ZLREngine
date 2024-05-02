@@ -1,13 +1,13 @@
-//Containers
+// Containers
 #include <map>
 #include <vector>
 
-//GL Math
+// GL Math
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 
-//Strings
+// Strings
 #include <string>
 
-//Utilities
+// Utilities
 #include <functional>
