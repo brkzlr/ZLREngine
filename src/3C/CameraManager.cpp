@@ -1,8 +1,11 @@
 #include "3C/CameraManager.h"
-#include "precomp.h"
 
 #include "3C/InputManager.h"
-#include "Constants.h"
+
+#include <glm/geometric.hpp>
+#include <glm/trigonometric.hpp>
+
+#include <cmath>
 
 CameraManager* CameraManager::ms_Instance = nullptr;
 
@@ -51,9 +54,7 @@ void CameraManager::Update(float deltaTime)
 	}
 
 	// Mouse
-	float xPos = inputMgr->GetMouseX() - SCR_HEIGHT / 2.0f;
-	float yPos = SCR_WIDTH / 2.0f - inputMgr->GetMouseY();
-	CameraLook(xPos, yPos);
+	CameraLook(inputMgr->GetMouseDeltaX(), -inputMgr->GetMouseDeltaY());
 }
 
 void CameraManager::UpdateCameraVectors()

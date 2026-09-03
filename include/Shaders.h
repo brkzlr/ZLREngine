@@ -1,6 +1,15 @@
 #ifndef SHADERS_H
 #define SHADERS_H
 
+#include <glm/mat2x2.hpp>
+#include <glm/mat3x3.hpp>
+#include <glm/mat4x4.hpp>
+#include <glm/vec2.hpp>
+#include <glm/vec3.hpp>
+#include <glm/vec4.hpp>
+
+#include <string>
+
 class Shaders {
 private:
 	unsigned int m_ID;

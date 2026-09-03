@@ -1,8 +1,8 @@
-#include "InputManager.h"
-#include "precomp.h"
+#include "3C/InputManager.h"
 
-#include <SDL2/SDL_events.h>
-#include <SDL2/SDL_keyboard.h>
+#include <SDL3/SDL_events.h>
+#include <SDL3/SDL_keyboard.h>
+#include <SDL3/SDL_mouse.h>
 
 InputManager* InputManager::ms_Instance = nullptr;
 
@@ -22,10 +22,10 @@ InputManager::InputManager()
 void InputManager::Update()
 {
 	SDL_PumpEvents();
-	m_MouseButtons = SDL_GetMouseState(&m_MouseX, &m_MouseY);
+	m_MouseButtons = SDL_GetRelativeMouseState(&m_MouseDeltaX, &m_MouseDeltaY);
 }
 
 bool InputManager::IsMouseBtnPressed(int mouseBtn) const
 {
-	return m_MouseButtons & SDL_BUTTON(mouseBtn);
+	return m_MouseButtons & SDL_BUTTON_MASK(mouseBtn);
 }

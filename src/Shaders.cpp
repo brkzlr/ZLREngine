@@ -1,9 +1,11 @@
-#include "shaders.h"
+#include "Shaders.h"
+
 #include "External/glad.h"
-#include "precomp.h"
+
 #include <fstream>
 #include <iostream>
 #include <sstream>
+#include <string>
 
 Shaders::Shaders(const char* vertexPath, const char* fragmentPath, const char* geometryPath)
 {

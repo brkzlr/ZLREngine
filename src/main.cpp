@@ -1,14 +1,18 @@
-#include <SDL2/SDL.h>
-#include <iostream>
-
-#define GLAD_GL_IMPLEMENTATION
-#include "External/glad.h"
-#include "External/stb_image.h"
-
 #include "3C/CameraManager.h"
 #include "3C/InputManager.h"
 #include "Constants.h"
-#include "shaders.h"
+#include "Shaders.h"
+
+#include "External/glad.h"
+#include "External/stb_image.h"
+#include <SDL3/SDL.h>
+#include <glm/ext/matrix_clip_space.hpp>
+#include <glm/ext/matrix_transform.hpp>
+#include <glm/mat4x4.hpp>
+#include <glm/trigonometric.hpp>
+#include <glm/vec3.hpp>
+
+#include <iostream>
 
 unsigned int LoadTexture(const char* path);
 
@@ -18,13 +22,13 @@ int main()
 	SDL_GLContext glContext;
 
 	// Set GL Context options
-	SDL_InitSubSystem(SDL_INIT_EVERYTHING);
-	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
-	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 3);
+	SDL_Init(SDL_INIT_VIDEO);
+	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 4);
+	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 6);
 	SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
 
 	// Create our SDL GL window and renderer
-	mainWindow = SDL_CreateWindow("ZLR", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, SCR_WIDTH, SCR_HEIGHT, SDL_WINDOW_OPENGL | SDL_WINDOW_SHOWN);
+	mainWindow = SDL_CreateWindow("ZLR", SCR_WIDTH, SCR_HEIGHT, SDL_WINDOW_OPENGL);
 	if (mainWindow == nullptr) {
 		std::cerr << "Could not create a window! Error: " << SDL_GetError() << std::endl;
 		return -1;
@@ -40,8 +44,7 @@ int main()
 	}
 
 	// Set SDL and OpenGL options
-	SDL_SetWindowGrab(mainWindow, SDL_TRUE);
-	SDL_ShowCursor(SDL_DISABLE);
+	SDL_SetWindowRelativeMouseMode(mainWindow, true);
 	glEnable(GL_DEPTH_TEST);
 
 	// Load and create texture
@@ -141,7 +144,7 @@ int main()
 	bool quit = false;
 	while (!quit) {
 		// Calculate deltaTime for per-frame time logic
-		float currentFrame = SDL_GetTicks() / 1000.0f;
+		float currentFrame = static_cast<float>(SDL_GetTicks()) / 1000.0f;
 		deltaTime = currentFrame - lastFrame;
 		lastFrame = currentFrame;
 
@@ -160,7 +163,6 @@ int main()
 		if (inputMgr->IsKeyPressed(SDL_SCANCODE_G)) {
 			flash = false;
 		}
-		SDL_WarpMouseInWindow(mainWindow, SCR_HEIGHT / 2.0f, SCR_WIDTH / 2.0f);
 		glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
@@ -241,6 +243,7 @@ int main()
 	glDeleteVertexArrays(1, &cubeVAO);
 	glDeleteVertexArrays(1, &lightVAO);
 	glDeleteBuffers(1, &VBO);
+	SDL_GL_DestroyContext(glContext);
 	SDL_DestroyWindow(mainWindow);
 	mainWindow = nullptr;
 	SDL_Quit();

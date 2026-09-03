@@ -1,24 +1,25 @@
-cmake_minimum_required(VERSION 3.29)
-project(ZLREngine)
+cmake_minimum_required(VERSION 4.0...4.4)
+project(ZLREngine LANGUAGES C CXX)
 
-set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD 23)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
-set(CMAKE_BINARY_DIR ${CMAKE_SOURCE_DIR}/bin)
-set(EXECUTABLE_OUTPUT_PATH ${CMAKE_BINARY_DIR})
-set(LIBRARY_OUTPUT_PATH ${CMAKE_SOURCE_DIR}/lib)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/bin)
 
-file(GLOB_RECURSE SOURCES ${CMAKE_SOURCE_DIR}/src/*.cpp)
-add_executable(zlr ${SOURCES})
+find_package(SDL3 REQUIRED)
+find_package(glm REQUIRED)
 
-target_compile_options(zlr PRIVATE -g -pedantic-errors)
-target_link_libraries(zlr PRIVATE dl SDL2)
-target_include_directories(zlr PRIVATE ${CMAKE_SOURCE_DIR}/src)
-target_precompile_headers(zlr PRIVATE ${CMAKE_SOURCE_DIR}/src/precomp.h)
+add_library(External STATIC
+	External/glad.c
+	External/stb_image.cpp
+)
+target_include_directories(External PUBLIC ${CMAKE_SOURCE_DIR})
+target_compile_options(External PRIVATE -w)
 
-# Add Apple ARM brew include/library paths
-if (APPLE)
-	target_include_directories(zlr PRIVATE /opt/homebrew/include)
-	target_link_directories(zlr PRIVATE /opt/homebrew/lib)
-endif (APPLE)
+file(GLOB_RECURSE ENGINE_SOURCES CONFIGURE_DEPENDS ${CMAKE_SOURCE_DIR}/src/*.cpp)
+add_executable(zlr ${ENGINE_SOURCES})
+
+target_compile_options(zlr PRIVATE -g -pedantic-errors -Wall -Wextra -Wdeprecated -Wdeprecated-declarations)
+target_include_directories(zlr PRIVATE ${CMAKE_SOURCE_DIR}/include)
+target_link_libraries(zlr PRIVATE External SDL3::SDL3 glm::glm)
