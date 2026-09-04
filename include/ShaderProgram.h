@@ -1,5 +1,5 @@
-#ifndef SHADERS_H
-#define SHADERS_H
+#ifndef SHADERPROGRAM_H
+#define SHADERPROGRAM_H
 
 #include <glm/mat2x2.hpp>
 #include <glm/mat3x3.hpp>
@@ -8,16 +8,20 @@
 #include <glm/vec3.hpp>
 #include <glm/vec4.hpp>
 
+#include <expected>
 #include <string>
 
-class Shaders {
-private:
-	unsigned int m_ID;
-	void CheckCompileErrors(unsigned int shader, const std::string& type);
-
+class ShaderProgram {
 public:
 	// We'll leave geometryPath as null as we do not use geometry shaders for now.
-	Shaders(const char* vertexPath, const char* fragmentPath, const char* geometryPath = nullptr);
+	[[nodiscard]] static std::expected<ShaderProgram, std::string> Create(const char* vertexPath, const char* fragmentPath, const char* geometryPath = nullptr);
+
+	~ShaderProgram();
+	ShaderProgram(const ShaderProgram&) = delete;
+	ShaderProgram& operator=(const ShaderProgram&) = delete;
+	ShaderProgram(ShaderProgram&& other) noexcept;
+	ShaderProgram& operator=(ShaderProgram&& other) noexcept;
+
 	void Use();
 
 	// Shader uniform setting functions
@@ -30,5 +34,10 @@ public:
 	void SetMat2(const char* name, const glm::mat2& mat);
 	void SetMat3(const char* name, const glm::mat3& mat);
 	void SetMat4(const char* name, const glm::mat4& mat);
+
+private:
+	explicit ShaderProgram(unsigned int id);
+
+	unsigned int m_ID = 0;
 };
-#endif
+#endif // SHADERPROGRAM_H

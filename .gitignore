@@ -1,4 +1,5 @@
 bin
+build/
 
 # Ignore all CMake/Make stuff except Lists
 compile_commands.json

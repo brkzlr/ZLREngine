@@ -5,7 +5,10 @@
 #include <glm/geometric.hpp>
 #include <glm/trigonometric.hpp>
 
+#include <algorithm>
 #include <cmath>
+
+constexpr float cMaxPitch = 89.0f;
 
 CameraManager* CameraManager::ms_Instance = nullptr;
 
@@ -22,7 +25,7 @@ void CameraManager::Initialize(glm::vec3 position, glm::vec3 up, float yaw, floa
 	m_Position = position;
 	m_WorldUp = up;
 	m_Yaw = yaw;
-	m_Pitch = pitch;
+	m_Pitch = std::clamp(pitch, -cMaxPitch, cMaxPitch);
 	UpdateCameraVectors();
 }
 
@@ -100,13 +103,9 @@ void CameraManager::CameraLook(float xPos, float yPos)
 	yPos *= m_MouseSens;
 
 	m_Yaw += xPos;
-	m_Pitch += yPos;
 
 	// Constrain the pitch so we don't run into weird physics past a certain point
-	if (m_Pitch > 89.0f)
-		m_Pitch = 89.0f;
-	if (m_Pitch < -89.0f)
-		m_Pitch = -89.0f;
+	m_Pitch = std::clamp(m_Pitch + yPos, -cMaxPitch, cMaxPitch);
 
 	UpdateCameraVectors();
 }
