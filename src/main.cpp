@@ -1,6 +1,7 @@
 #include "3C/CameraManager.h"
 #include "3C/InputManager.h"
 #include "Constants.h"
+#include "GLDebug.h"
 #include "ShaderProgram.h"
 
 #include "External/glad.h"
@@ -31,6 +32,7 @@ int main()
 	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 4);
 	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 6);
 	SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
+	SDL_GL_SetAttribute(SDL_GL_CONTEXT_FLAGS, SDL_GL_CONTEXT_DEBUG_FLAG);
 
 	// Create our SDL GL window and renderer
 	mainWindow = SDL_CreateWindow("ZLR", SCR_WIDTH, SCR_HEIGHT, SDL_WINDOW_OPENGL);
@@ -49,6 +51,10 @@ int main()
 	if (!gladLoadGL(reinterpret_cast<GLADloadfunc>(SDL_GL_GetProcAddress))) {
 		std::cerr << "Failed to initialize GLAD" << std::endl;
 		return -1;
+	}
+
+	if (!EnableGLDebugOutput()) {
+		std::cerr << "Could not enable GL debug output: the context has no debug flag" << std::endl;
 	}
 
 	// Set SDL and OpenGL options
