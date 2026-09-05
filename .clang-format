@@ -20,6 +20,18 @@ BraceWrapping:
   SplitEmptyRecord: true
   SplitEmptyNamespace: true
 BreakBeforeBraces: Custom
+IncludeBlocks: Regroup
+IncludeCategories:
+  - Regex: '^"External/'
+    Priority: 3
+  - Regex: '^<(SDL3|glm)/'
+    Priority: 3
+  - Regex: '^"'
+    Priority: 2
+  - Regex: '^<'
+    Priority: 4
+IncludeIsMainRegex: '$'
 NamespaceIndentation: None # Manually set to None to follow WebKit's coding guidelines
+SortIncludes: CaseSensitive
 TabWidth: 4
 UseTab: ForIndentation

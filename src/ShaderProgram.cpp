@@ -18,7 +18,7 @@ struct StageRequest {
 
 constexpr GLsizei cInfoLogSize = 1024;
 
-static std::expected<std::string, std::string> ReadShaderFile(const char* path)
+[[nodiscard]] static std::expected<std::string, std::string> ReadShaderFile(const char* path)
 {
 	std::ifstream file(path);
 	if (!file.is_open()) {
@@ -34,16 +34,16 @@ static std::expected<std::string, std::string> ReadShaderFile(const char* path)
 	return stream.str();
 }
 
-static void DeleteShaders(std::span<const unsigned int> shaders)
+static void DeleteShaders(std::span<const GLuint> shaders)
 {
-	for (unsigned int shader : shaders) {
+	for (GLuint shader : shaders) {
 		glDeleteShader(shader);
 	}
 }
 
-static std::expected<unsigned int, std::string> CompileShader(const StageRequest& request, const char* source)
+[[nodiscard]] static std::expected<GLuint, std::string> CompileShader(const StageRequest& request, const char* source)
 {
-	unsigned int shader = glCreateShader(request.type);
+	GLuint shader = glCreateShader(request.type);
 	glShaderSource(shader, 1, &source, nullptr);
 	glCompileShader(shader);
 
@@ -59,9 +59,9 @@ static std::expected<unsigned int, std::string> CompileShader(const StageRequest
 	return shader;
 }
 
-static std::expected<std::vector<unsigned int>, std::string> CompileStages(std::span<const StageRequest> requests)
+[[nodiscard]] static std::expected<std::vector<GLuint>, std::string> CompileStages(std::span<const StageRequest> requests)
 {
-	std::vector<unsigned int> shaders;
+	std::vector<GLuint> shaders;
 
 	for (const StageRequest& request : requests) {
 		if (request.path == nullptr) {
@@ -74,7 +74,7 @@ static std::expected<std::vector<unsigned int>, std::string> CompileStages(std::
 			return std::unexpected(source.error());
 		}
 
-		std::expected<unsigned int, std::string> shader = CompileShader(request, source->c_str());
+		std::expected<GLuint, std::string> shader = CompileShader(request, source->c_str());
 		if (!shader) {
 			DeleteShaders(shaders);
 			return std::unexpected(shader.error());
@@ -86,10 +86,10 @@ static std::expected<std::vector<unsigned int>, std::string> CompileStages(std::
 	return shaders;
 }
 
-static std::expected<unsigned int, std::string> LinkProgram(std::span<const unsigned int> shaders)
+[[nodiscard]] static std::expected<GLuint, std::string> LinkProgram(std::span<const GLuint> shaders)
 {
-	unsigned int program = glCreateProgram();
-	for (unsigned int shader : shaders) {
+	GLuint program = glCreateProgram();
+	for (GLuint shader : shaders) {
 		glAttachShader(program, shader);
 	}
 	glLinkProgram(program);
@@ -108,18 +108,18 @@ static std::expected<unsigned int, std::string> LinkProgram(std::span<const unsi
 
 std::expected<ShaderProgram, std::string> ShaderProgram::Create(const char* vertexPath, const char* fragmentPath, const char* geometryPath)
 {
-	const StageRequest requests[] = {
+	const StageRequest cRequests[] = {
 		{ .type = GL_VERTEX_SHADER, .name = "Vertex", .path = vertexPath },
 		{ .type = GL_FRAGMENT_SHADER, .name = "Fragment", .path = fragmentPath },
 		{ .type = GL_GEOMETRY_SHADER, .name = "Geometry", .path = geometryPath }
 	};
 
-	std::expected<std::vector<unsigned int>, std::string> shaders = CompileStages(requests);
+	std::expected<std::vector<GLuint>, std::string> shaders = CompileStages(cRequests);
 	if (!shaders) {
 		return std::unexpected(shaders.error());
 	}
 
-	std::expected<unsigned int, std::string> program = LinkProgram(*shaders);
+	std::expected<GLuint, std::string> program = LinkProgram(*shaders);
 	DeleteShaders(*shaders);
 	if (!program) {
 		return std::unexpected(program.error());
@@ -128,69 +128,69 @@ std::expected<ShaderProgram, std::string> ShaderProgram::Create(const char* vert
 	return ShaderProgram(*program);
 }
 
-ShaderProgram::ShaderProgram(unsigned int id)
-	: m_ID(id)
+ShaderProgram::ShaderProgram(GLuint id)
+    : m_id(id)
 {
 }
 
 ShaderProgram::~ShaderProgram()
 {
-	glDeleteProgram(m_ID);
+	glDeleteProgram(m_id);
 }
 
 ShaderProgram::ShaderProgram(ShaderProgram&& other) noexcept
-	: m_ID(std::exchange(other.m_ID, 0))
+    : m_id(std::exchange(other.m_id, 0))
 {
 }
 
 ShaderProgram& ShaderProgram::operator=(ShaderProgram&& other) noexcept
 {
 	if (this != &other) {
-		glDeleteProgram(m_ID);
-		m_ID = std::exchange(other.m_ID, 0);
+		glDeleteProgram(m_id);
+		m_id = std::exchange(other.m_id, 0);
 	}
 	return *this;
 }
 
 void ShaderProgram::Use()
 {
-	glUseProgram(m_ID);
+	glUseProgram(m_id);
 }
 
 // Shader uniform setting functions
 void ShaderProgram::SetBool(const char* name, bool value)
 {
-	glProgramUniform1i(m_ID, glGetUniformLocation(m_ID, name), static_cast<int>(value));
+	glProgramUniform1i(m_id, glGetUniformLocation(m_id, name), static_cast<GLint>(value));
 }
-void ShaderProgram::SetInt(const char* name, int value)
+void ShaderProgram::SetInt(const char* name, GLint value)
 {
-	glProgramUniform1i(m_ID, glGetUniformLocation(m_ID, name), value);
+	glProgramUniform1i(m_id, glGetUniformLocation(m_id, name), value);
 }
 void ShaderProgram::SetFloat(const char* name, float value)
 {
-	glProgramUniform1f(m_ID, glGetUniformLocation(m_ID, name), value);
+	glProgramUniform1f(m_id, glGetUniformLocation(m_id, name), value);
 }
 void ShaderProgram::SetVec2(const char* name, const glm::vec2& value)
 {
-	glProgramUniform2fv(m_ID, glGetUniformLocation(m_ID, name), 1, &value[0]);
+	glProgramUniform2fv(m_id, glGetUniformLocation(m_id, name), 1, &value[0]);
 }
 void ShaderProgram::SetVec3(const char* name, const glm::vec3& value)
 {
-	glProgramUniform3fv(m_ID, glGetUniformLocation(m_ID, name), 1, &value[0]);
+	glProgramUniform3fv(m_id, glGetUniformLocation(m_id, name), 1, &value[0]);
 }
 void ShaderProgram::SetVec4(const char* name, const glm::vec4& value)
 {
-	glProgramUniform4fv(m_ID, glGetUniformLocation(m_ID, name), 1, &value[0]);
+	glProgramUniform4fv(m_id, glGetUniformLocation(m_id, name), 1, &value[0]);
 }
 void ShaderProgram::SetMat2(const char* name, const glm::mat2& mat)
 {
-	glProgramUniformMatrix2fv(m_ID, glGetUniformLocation(m_ID, name), 1, GL_FALSE, &mat[0][0]);
+	glProgramUniformMatrix2fv(m_id, glGetUniformLocation(m_id, name), 1, GL_FALSE, &mat[0][0]);
 }
 void ShaderProgram::SetMat3(const char* name, const glm::mat3& mat)
 {
-	glProgramUniformMatrix3fv(m_ID, glGetUniformLocation(m_ID, name), 1, GL_FALSE, &mat[0][0]);
+	glProgramUniformMatrix3fv(m_id, glGetUniformLocation(m_id, name), 1, GL_FALSE, &mat[0][0]);
 }
 void ShaderProgram::SetMat4(const char* name, const glm::mat4& mat)
 {
-	glProgramUniformMatrix4fv(m_ID, glGetUniformLocation(m_ID, name), 1, GL_FALSE, &mat[0][0]);
+	glProgramUniformMatrix4fv(m_id, glGetUniformLocation(m_id, name), 1, GL_FALSE, &mat[0][0]);
 }

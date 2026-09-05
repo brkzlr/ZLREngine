@@ -13,11 +13,12 @@
 #include <glm/trigonometric.hpp>
 #include <glm/vec3.hpp>
 
+#include <cmath>
 #include <expected>
 #include <iostream>
 #include <utility>
 
-unsigned int LoadTexture(const char* path);
+[[nodiscard]] GLuint LoadTexture(const char* path);
 
 int main()
 {
@@ -35,7 +36,7 @@ int main()
 	SDL_GL_SetAttribute(SDL_GL_CONTEXT_FLAGS, SDL_GL_CONTEXT_DEBUG_FLAG);
 
 	// Create our SDL GL window and renderer
-	mainWindow = SDL_CreateWindow("ZLR", SCR_WIDTH, SCR_HEIGHT, SDL_WINDOW_OPENGL);
+	mainWindow = SDL_CreateWindow("ZLR", cScreenWidth, cScreenHeight, SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE);
 	if (mainWindow == nullptr) {
 		std::cerr << "Could not create a window! Error: " << SDL_GetError() << std::endl;
 		return -1;
@@ -71,8 +72,8 @@ int main()
 	float aspectRatio = static_cast<float>(framebufferWidth) / static_cast<float>(framebufferHeight);
 
 	// Load and create texture
-	unsigned int diffMap = LoadTexture("textures/container.png");
-	unsigned int specMap = LoadTexture("textures/container_spec.png");
+	GLuint diffMap = LoadTexture("textures/container.png");
+	GLuint specMap = LoadTexture("textures/container_spec.png");
 
 	// Vertex data
 	float vertices[] = {
@@ -121,7 +122,7 @@ int main()
 	};
 
 	// Initialize Vertex objects
-	unsigned int VBO, cubeVAO, lightVAO;
+	GLuint VBO, cubeVAO, lightVAO;
 	glGenVertexArrays(1, &cubeVAO);
 	glGenBuffers(1, &VBO);
 
@@ -150,14 +151,14 @@ int main()
 	glEnableVertexAttribArray(0);
 
 	{
-		std::expected<ShaderProgram, std::string> shaderResult = ShaderProgram::Create("shaders/cubeVertex", "shaders/cubeFragment");
+		std::expected<ShaderProgram, std::string> shaderResult = ShaderProgram::Create("shaders/Cube.vert", "shaders/Cube.frag");
 		if (!shaderResult) {
 			std::cerr << shaderResult.error() << std::endl;
 			return -1;
 		}
 		ShaderProgram shader = std::move(*shaderResult);
 
-		std::expected<ShaderProgram, std::string> lightShaderResult = ShaderProgram::Create("shaders/lightVertex", "shaders/lightFragment");
+		std::expected<ShaderProgram, std::string> lightShaderResult = ShaderProgram::Create("shaders/Light.vert", "shaders/Light.frag");
 		if (!lightShaderResult) {
 			std::cerr << lightShaderResult.error() << std::endl;
 			return -1;
@@ -169,7 +170,7 @@ int main()
 		float lastFrame = 0.0f;
 
 		// Our FPS Camera
-		CameraManager::GetInstance()->Initialize(glm::vec3(0.0f, 0.0f, 3.0f), { 0.f, 1.f, 0.f }, -90.0f, 0.0f);
+		CameraManager::GetInstance().Initialize(glm::vec3(0.0f, 0.0f, 3.0f), { 0.0f, 1.0f, 0.0f }, -90.0f, 0.0f);
 
 		// Light
 		glm::vec3 lightPos(1.0f, 0.0f, 1.5f);
@@ -178,32 +179,45 @@ int main()
 		// Render loop
 		bool quit = false;
 		while (!quit) {
+			SDL_Event event;
+			while (SDL_PollEvent(&event)) {
+				if (event.type == SDL_EVENT_QUIT) {
+					quit = true;
+				}
+				else if (event.type == SDL_EVENT_WINDOW_PIXEL_SIZE_CHANGED) {
+					framebufferWidth = event.window.data1;
+					framebufferHeight = event.window.data2;
+					glViewport(0, 0, framebufferWidth, framebufferHeight);
+					aspectRatio = static_cast<float>(framebufferWidth) / static_cast<float>(framebufferHeight);
+				}
+			}
+
 			// Calculate deltaTime for per-frame time logic
 			float currentFrame = static_cast<float>(SDL_GetTicks()) / 1000.0f;
 			deltaTime = currentFrame - lastFrame;
 			lastFrame = currentFrame;
 
-			InputManager* inputMgr = InputManager::GetInstance();
-			CameraManager* camMgr = CameraManager::GetInstance();
-			inputMgr->Update();
-			camMgr->Update(deltaTime);
+			InputManager& inputMgr = InputManager::GetInstance();
+			CameraManager& camMgr = CameraManager::GetInstance();
+			inputMgr.Update();
+			camMgr.Update(deltaTime);
 
 			// Query our keyboard state
-			if (inputMgr->IsKeyPressed(SDL_SCANCODE_ESCAPE)) {
+			if (inputMgr.IsKeyPressed(SDL_SCANCODE_ESCAPE)) {
 				quit = true;
 			}
-			if (inputMgr->IsKeyPressed(SDL_SCANCODE_F)) {
+			if (inputMgr.IsKeyPressed(SDL_SCANCODE_F)) {
 				flash = true;
 			}
-			if (inputMgr->IsKeyPressed(SDL_SCANCODE_G)) {
+			if (inputMgr.IsKeyPressed(SDL_SCANCODE_G)) {
 				flash = false;
 			}
 			glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
 			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 			// Change lightPos over time
-			lightPos.x = sin(currentFrame) * 2.0f;
-			lightPos.z = cos(currentFrame) * 1.5f;
+			lightPos.x = std::sin(currentFrame) * 2.0f;
+			lightPos.z = std::cos(currentFrame) * 1.5f;
 
 			// Activate all buffer objects and shaders.
 			shader.Use();
@@ -212,61 +226,61 @@ int main()
 			glActiveTexture(GL_TEXTURE1);
 			glBindTexture(GL_TEXTURE_2D, specMap);
 			glBindVertexArray(cubeVAO);
-			shader.SetInt("material.diffuse", 0);
-			shader.SetInt("material.specular", 1);
-			shader.SetFloat("material.shineVal", 32.0f);
-			shader.SetVec3("viewPos", camMgr->GetPosition());
+			shader.SetInt("u_material.diffuse", 0);
+			shader.SetInt("u_material.specular", 1);
+			shader.SetFloat("u_material.shininess", 32.0f);
+			shader.SetVec3("u_viewPos", camMgr.GetPosition());
 
 			// Directional Light
-			shader.SetVec3("sun.ambient", glm::vec3(0.05f, 0.05f, 0.05f));
-			shader.SetVec3("sun.diffuse", glm::vec3(0.4f, 0.4f, 0.4f));
-			shader.SetVec3("sun.specular", glm::vec3(0.5f, 0.5f, 0.5f));
-			shader.SetVec3("sun.direction", glm::vec3(-0.2f, -1.0f, -0.3f));
+			shader.SetVec3("u_sun.ambient", glm::vec3(0.05f, 0.05f, 0.05f));
+			shader.SetVec3("u_sun.diffuse", glm::vec3(0.4f, 0.4f, 0.4f));
+			shader.SetVec3("u_sun.specular", glm::vec3(0.5f, 0.5f, 0.5f));
+			shader.SetVec3("u_sun.direction", glm::vec3(-0.2f, -1.0f, -0.3f));
 
 			// Point Light
-			shader.SetVec3("pLight.ambient", glm::vec3(0.05f, 0.05f, 0.05f));
-			shader.SetVec3("pLight.diffuse", glm::vec3(0.8f, 0.8f, 0.8f));
-			shader.SetVec3("pLight.specular", glm::vec3(1.0f, 1.0f, 1.0f));
-			shader.SetVec3("pLight.position", lightPos);
-			shader.SetFloat("pLight.constant", 1.0f);
-			shader.SetFloat("pLight.linear", 0.09f);
-			shader.SetFloat("pLight.quadratic", 0.032f);
+			shader.SetVec3("u_pointLight.ambient", glm::vec3(0.05f, 0.05f, 0.05f));
+			shader.SetVec3("u_pointLight.diffuse", glm::vec3(0.8f, 0.8f, 0.8f));
+			shader.SetVec3("u_pointLight.specular", glm::vec3(1.0f, 1.0f, 1.0f));
+			shader.SetVec3("u_pointLight.position", lightPos);
+			shader.SetFloat("u_pointLight.constant", 1.0f);
+			shader.SetFloat("u_pointLight.linear", 0.09f);
+			shader.SetFloat("u_pointLight.quadratic", 0.032f);
 
 			// Spot Light
-			shader.SetVec3("flashlight.position", camMgr->GetPosition());
-			shader.SetVec3("flashlight.direction", camMgr->GetCamForward());
-			shader.SetVec3("flashlight.ambient", glm::vec3(0.0f, 0.0f, 0.0f));
-			shader.SetVec3("flashlight.diffuse", glm::vec3(1.0f, 1.0f, 1.0f));
-			shader.SetVec3("flashlight.specular", glm::vec3(1.0f, 1.0f, 1.0f));
-			shader.SetFloat("flashlight.constant", 1.0f);
-			shader.SetFloat("flashlight.linear", 0.09f);
-			shader.SetFloat("flashlight.quadratic", 0.032f);
-			shader.SetFloat("flashlight.cutoffAngle", glm::cos(glm::radians(12.5f)));
-			shader.SetFloat("flashlight.outerCutoff", glm::cos(glm::radians(15.0f)));
-			shader.SetBool("isFLon", flash);
+			shader.SetVec3("u_flashlight.position", camMgr.GetPosition());
+			shader.SetVec3("u_flashlight.direction", camMgr.GetCamForward());
+			shader.SetVec3("u_flashlight.ambient", glm::vec3(0.0f, 0.0f, 0.0f));
+			shader.SetVec3("u_flashlight.diffuse", glm::vec3(1.0f, 1.0f, 1.0f));
+			shader.SetVec3("u_flashlight.specular", glm::vec3(1.0f, 1.0f, 1.0f));
+			shader.SetFloat("u_flashlight.constant", 1.0f);
+			shader.SetFloat("u_flashlight.linear", 0.09f);
+			shader.SetFloat("u_flashlight.quadratic", 0.032f);
+			shader.SetFloat("u_flashlight.cutoffAngle", glm::cos(glm::radians(12.5f)));
+			shader.SetFloat("u_flashlight.outerCutoff", glm::cos(glm::radians(15.0f)));
+			shader.SetBool("u_isFlashlightOn", flash);
 
 			// Rotate cube over time
 			glm::mat4 modelMat(1.0f);
 			modelMat = glm::rotate(modelMat, currentFrame * glm::radians(50.0f), glm::vec3(0.5f, 1.0f, 0.0f));
-			shader.SetMat4("modelMatrix", modelMat);
+			shader.SetMat4("u_modelMatrix", modelMat);
 
 			glm::mat4 viewMat(1.0f);
-			viewMat = camMgr->GetViewMatrix();
-			shader.SetMat4("viewMatrix", viewMat);
+			viewMat = camMgr.GetViewMatrix();
+			shader.SetMat4("u_viewMatrix", viewMat);
 
 			glm::mat4 projectionMat(1.0f);
 			projectionMat = glm::perspective(glm::radians(45.0f), aspectRatio, 0.1f, 100.0f);
-			shader.SetMat4("projectionMatrix", projectionMat);
+			shader.SetMat4("u_projectionMatrix", projectionMat);
 			glDrawArrays(GL_TRIANGLES, 0, 36);
 
 			// Also draw lamp object
 			lightShader.Use();
-			lightShader.SetMat4("projectionMatrix", projectionMat);
-			lightShader.SetMat4("viewMatrix", viewMat);
+			lightShader.SetMat4("u_projectionMatrix", projectionMat);
+			lightShader.SetMat4("u_viewMatrix", viewMat);
 			modelMat = glm::mat4(1.0f);
 			modelMat = glm::translate(modelMat, lightPos);
 			modelMat = glm::scale(modelMat, glm::vec3(0.2f));
-			lightShader.SetMat4("modelMatrix", modelMat);
+			lightShader.SetMat4("u_modelMatrix", modelMat);
 
 			glBindVertexArray(lightVAO);
 			glDrawArrays(GL_TRIANGLES, 0, 36);
@@ -286,7 +300,7 @@ int main()
 	return 0;
 }
 
-unsigned int LoadTexture(const char* path)
+GLuint LoadTexture(const char* path)
 {
 	stbi_set_flip_vertically_on_load(true);
 
@@ -317,7 +331,7 @@ unsigned int LoadTexture(const char* path)
 		return 0;
 	}
 
-	unsigned int textureID;
+	GLuint textureID;
 	glGenTextures(1, &textureID);
 	glBindTexture(GL_TEXTURE_2D, textureID);
 

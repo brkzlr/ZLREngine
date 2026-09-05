@@ -20,6 +20,6 @@ target_compile_options(External PRIVATE -w)
 file(GLOB_RECURSE ENGINE_SOURCES CONFIGURE_DEPENDS ${CMAKE_SOURCE_DIR}/src/*.cpp)
 add_executable(zlr ${ENGINE_SOURCES})
 
-target_compile_options(zlr PRIVATE -g -pedantic-errors -Wall -Wextra -Wdeprecated -Wdeprecated-declarations)
+target_compile_options(zlr PRIVATE -g -pedantic-errors -Wall -Wextra -Wdeprecated -Wdeprecated-declarations -Werror)
 target_include_directories(zlr PRIVATE ${CMAKE_SOURCE_DIR}/include)
 target_link_libraries(zlr PRIVATE External SDL3::SDL3 glm::glm)

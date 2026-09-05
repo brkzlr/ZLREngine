@@ -1,6 +1,7 @@
 #ifndef SHADERPROGRAM_H
 #define SHADERPROGRAM_H
 
+#include "External/glad.h"
 #include <glm/mat2x2.hpp>
 #include <glm/mat3x3.hpp>
 #include <glm/mat4x4.hpp>
@@ -26,7 +27,7 @@ public:
 
 	// Shader uniform setting functions
 	void SetBool(const char* name, bool value);
-	void SetInt(const char* name, int value);
+	void SetInt(const char* name, GLint value);
 	void SetFloat(const char* name, float value);
 	void SetVec2(const char* name, const glm::vec2& value);
 	void SetVec3(const char* name, const glm::vec3& value);
@@ -36,8 +37,8 @@ public:
 	void SetMat4(const char* name, const glm::mat4& mat);
 
 private:
-	explicit ShaderProgram(unsigned int id);
+	explicit ShaderProgram(GLuint id);
 
-	unsigned int m_ID = 0;
+	GLuint m_id = 0;
 };
 #endif // SHADERPROGRAM_H
